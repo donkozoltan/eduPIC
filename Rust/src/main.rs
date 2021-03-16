@@ -117,24 +117,24 @@ struct ParticleType {                                // coordinates of particles
 //------------------------------------------------------------------------------------------//
 
 fn main(){
-    println!(">> rustPIC: starting...");
-    println!(">> rustPIC: **************************************************************************");
-    println!(">> rustPIC: Copyright (C) 2021 Z. Donko et al.");
-    println!(">> rustPIC: This program comes with ABSOLUTELY NO WARRANTY");
-    println!(">> rustPIC: This is free software, you are welcome to use, modify and redistribute it");
-    println!(">> rustPIC: according to the GNU General Public License, https://www.gnu.org/licenses/");
-    println!(">> rustPIC: **************************************************************************");
+    println!(">> eduPIC: starting...");
+    println!(">> eduPIC: **************************************************************************");
+    println!(">> eduPIC: Copyright (C) 2021 Z. Donko et al.");
+    println!(">> eduPIC: This program comes with ABSOLUTELY NO WARRANTY");
+    println!(">> eduPIC: This is free software, you are welcome to use, modify and redistribute it");
+    println!(">> eduPIC: according to the GNU General Public License, https://www.gnu.org/licenses/");
+    println!(">> eduPIC: **************************************************************************");
     // reading in command line arguments
     let args:Vec<String> = env::args().collect();
-    if args.len() == 1 { println!(">> rustPIC: ERROR = need starting_cycle argument"); std::process::exit(1); }
+    if args.len() == 1 { println!(">> eduPIC: ERROR = need starting_cycle argument"); std::process::exit(1); }
 
     let cycle:usize = args[1].parse::<usize>().unwrap();
     let mut cycles_done:usize = 0;
 
     let mut measurement:bool = false;
     if (args.len() > 2) && (args[2].parse::<String>().unwrap() == "m") { measurement = true; }
-    if measurement { println!(">> rustPIC: measurement mode ON"); } 
-    else { println!(">> rustPIC: measurement mode OFF"); }
+    if measurement { println!(">> eduPIC: measurement mode ON"); } 
+    else { println!(">> eduPIC: measurement mode OFF"); }
 
     // initializing grid quantities (fixed size)
     let mut efield: Vec<f64>          = vec![0.0;N_G];       // electric field 
@@ -201,15 +201,21 @@ fn main(){
     let mut rng = rand::thread_rng();       // ThreadRNG - autoseeded from memory entropy, HC-128 algorithm
 
     if cycle == 0 {
+        if std::path::Path::new("picdata.bin").exists() {
+            println!(">> eduPIC: Warning: Data from previous calculation are detected.");
+            println!("           To start a new simulation from the beginning, please delete all output files before running ./eduPIC 0");
+            println!("           To continue the existing calculation, please specify the number of cycles to run, e.g. ./eduPIC 100");
+            std::process::exit(0); 
+        }
         // initializing particles
         init_particles(N_INIT, L, &mut Electrons, &mut rng);
         init_particles(N_INIT, L, &mut Ions, &mut rng);
 
-        println!(">> rustPIC: Running initializing cycle...");
+        println!(">> eduPIC: Running initializing cycle...");
         for t in 0..N_T{
             if t%1000==0 {
                 println!(
-                    "tick {}  electrons {}  ions {}",
+                    "c = 1  t = {}  #e = {}  #i = {}",
                     t, Electrons.len(), Ions.len() );
             }
 
@@ -230,20 +236,19 @@ fn main(){
         }
 
         cycles_done = 1;
-        save_particle_data(String::from("particle_data.bin"), cycles_done, &Electrons, &Ions).map_err(|err| println!("{:?}", err)).ok();
+        save_particle_data(String::from("picdata.bin"), cycles_done, &Electrons, &Ions).map_err(|err| println!("{:?}", err)).ok();
 
     } else {
         // load particles
-        let(mut cycles_done, mut Electrons, mut Ions) = load_particle_data(String::from("particle_data.bin"));
+        let(mut cycles_done, mut Electrons, mut Ions) = load_particle_data(String::from("picdata.bin"));
 
-        println!(">> rustPIC: Running {} cycles...",cycle);
+        println!(">> eduPIC: Running {} cycles...",cycle);
         for c in 0..cycle{
             for t in 0..N_T{
                 if t%1000==0{
                     println!(
-                        ">> cycle {}/{} tick {:6}  electrons {}  ions {}",
-                        cycles_done+c, cycle+cycles_done-1,
-                        t, Electrons.len(), Ions.len() );
+                        "c = {}  t = {}  #e = {}  #i = {}",
+                        cycles_done+c, t, Electrons.len(), Ions.len() );
                 }
 
                 get_density(&mut e_density, &mut cumul_e_density, &mut Electrons);
@@ -333,7 +338,7 @@ fn main(){
         cycles_done += cycle;
         N_e = Electrons.len();
         N_i = Ions.len();
-        save_particle_data(String::from("particle_data.bin"), cycles_done, &Electrons, &Ions).map_err(|err| println!("{:?}", err)).ok();
+        save_particle_data(String::from("picdata.bin"), cycles_done, &Electrons, &Ions).map_err(|err| println!("{:?}", err)).ok();
     }
 
     if measurement {
@@ -347,7 +352,7 @@ fn main(){
             mean_i_energy_pow, mean_i_energy_gnd, N_e_abs_pow, N_e_abs_gnd, N_i_abs_pow, N_i_abs_gnd, 
             cycle, &powere_xt, &poweri_xt, &mut conditions_OK).map_err(|err| println!("{:?}", err)).ok();
         if conditions_OK {    
-            println!(">> rustPIC: Saving measurements to disk...");
+            println!(">> eduPIC: Saving measurements to disk...");
             println!(">> saving densities.dat");
             save_densities(&cumul_e_density, &cumul_i_density, cycle).map_err(|err| println!("{:?}", err)).ok();
             println!(">> saving eepf.dat");
@@ -381,7 +386,7 @@ fn main(){
             save_xt_2("meanei_xt.dat", &meanei_xt, &counter_i_xt).map_err(|err| println!("{:?}", err)).ok();
         }
     }
-    println!(">> rustPIC: Simulation of {} cycle(s) is done lasting {:.3} sec.", cycle, 0.001*start.elapsed().as_millis() as f64);
+    println!(">> eduPIC: Simulation of {} cycle(s) is done lasting {:.3} sec.", cycle, 0.001*start.elapsed().as_millis() as f64);
 }
 
 //----------------------------------------------------------------------//
@@ -757,6 +762,7 @@ fn save_particle_data(filename: String, cycle_done:usize, Electrons:&Vec<Particl
 
 fn load_particle_data(filename: String)->(usize,Vec<ParticleType>,Vec<ParticleType>)
 {
+    if !std::path::Path::new(&filename).exists() {println!(">> eduPIC: ERROR: No particle data file found, try running initial cycle using argument '0'"); std::process::exit(0); }
     let mut file = std::fs::File::open(filename).expect("unable to open file for reading");
     let c:usize                     = bincode::deserialize_from(&mut file).expect("unable to read from file");
     let Electrons:Vec<ParticleType> = bincode::deserialize_from(&mut file).expect("unable to read from file");
@@ -953,7 +959,7 @@ fn check_and_save_info(ne_max:f64, cycle:usize, mean_ee:f64, N_ee:u64, N_e:usize
         if nu > max_icoll_freq { max_icoll_freq = nu; }
     }
 
-    writeln!(file, "########################## rustPIC simulation report ############################");
+    writeln!(file, "########################## eduPIC simulation report ############################");
     writeln!(file, "Simulation parameters:");
     writeln!(file, "Gap distance                          = {:1.6e} [m]",  L );
     writeln!(file, "# of grid divisions                   = {:10}",        N_G );
@@ -991,8 +997,8 @@ fn check_and_save_info(ne_max:f64, cycle:usize, mean_ee:f64, N_ee:u64, N_e:usize
         writeln!(file, "--------------------------------------------------------------------------------");
         writeln!(file, "** STABILITY AND ACCURACY CONDITION(S) VIOLATED - REFINE SIMULATION SETTINGS! **");
         writeln!(file, "--------------------------------------------------------------------------------");
-        println!(">> rustPIC:  ERROR = STABILITY AND ACCURACY CONDITION(S) VIOLATED!");
-        println!(">> rustPIC:  for details see 'info.txt' and refine simulation settings!");
+        println!(">> eduPIC:  ERROR = STABILITY AND ACCURACY CONDITION(S) VIOLATED!");
+        println!(">> eduPIC:  for details see 'info.txt' and refine simulation settings!");
     } else {
 
         // calculate maximum energy for which the Courant condition holds:

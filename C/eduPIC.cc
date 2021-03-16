@@ -760,6 +760,7 @@ void load_particle_data(){
     
     strcpy(fname,"picdata.bin");
     f = fopen(fname,"r");
+    if (f==NULL) {printf(">> eduPIC: ERROR: No particle data file found, try running initial cycle using argument '0'\n"); exit(0); }
     fread(&Time,sizeof(double),1,f);
     fread(&d,sizeof(double),1,f);
     cycles_done = int(d);
@@ -1069,6 +1070,12 @@ int main (int argc, char *argv[]){
     //test_cross_sections(); return 1;
     datafile = fopen("conv.dat","a");
     if (arg1 == 0) {
+        if (FILE *file = fopen("picdata.bin", "r")) { fclose(file);
+            printf(">> eduPIC: Warning: Data from previous calculation are detected.\n");
+            printf("           To start a new simulation from the beginning, please delete all output files before running ./eduPIC 0\n");
+            printf("           To continue the existing calculation, please specify the number of cycles to run, e.g. ./eduPIC 100\n");
+            exit(0);
+        } 
         no_of_cycles = 1;
         cycle = 1;                                        // init cycle
         init(N_INIT);                                     // seed initial electrons & ions

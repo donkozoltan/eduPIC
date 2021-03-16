@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------//
-//         cppPIC : educational 1d3v PIC/MCC simulation code         //
+//         eduPIC : educational 1d3v PIC/MCC simulation code         //
 //           version 1.0, release date: March 16, 2021               //
 //                       :) Share & enjoy :)                         //
 //-------------------------------------------------------------------//
@@ -752,7 +752,7 @@ void save_particle_data(){
 
 void load_particle_data(){
     ifstream f("picdata.bin",std::ios::binary);
-
+    if (f.fail()) {cout<<">> eduPIC: ERROR: No particle data file found, try running initial cycle using argument '0'"<<endl; exit(0); }
     f.read(reinterpret_cast<char*>(&Time),sizeof(double));
     f.read(reinterpret_cast<char*>(&cycles_done),sizeof(int));
     f.read(reinterpret_cast<char*>(&N_e),sizeof(int));
@@ -915,7 +915,7 @@ void check_and_save_info(void){
     double ecoll_freq =  static_cast<double>(N_e_coll) / sim_time /  static_cast<double>(N_e);     // e collision frequency
     double icoll_freq =  static_cast<double>(N_i_coll) / sim_time /  static_cast<double>(N_i);     // ion collision frequency
 
-    f<<"########################## cppPIC simulation report ############################"<<endl;
+    f<<"########################## eduPIC simulation report ############################"<<endl;
     f<<"Simulation parameters:"<<endl;
     f<<"Gap distance                          = "<<L<<" [m]"<<endl;
     f<<"# of grid divisions                   = "<<N_G<<endl;
@@ -1039,6 +1039,13 @@ int main (int argc, char *argv[]){
     //test_cross_sections(); return 1;
 
     if (arg1 == 0) {
+        ifstream file("picdata.bin",std::ios::binary);
+        if (file.good()) { file.close();
+            cout<<">> eduPIC: Warning: Data from previous calculation are detected."<<endl;
+            cout<<"           To start a new simulation from the beginning, please delete all output files before running ./eduPIC 0"<<endl;
+            cout<<"           To continue the existing calculation, please specify the number of cycles to run, e.g. ./eduPIC 100"<<endl; 
+            exit(0); 
+        }
         no_of_cycles = 1;                                 
         cycle = 1;                                        // init cycle
         init(N_INIT);                                     // seed initial electrons & ions
