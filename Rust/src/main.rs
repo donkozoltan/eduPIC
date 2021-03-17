@@ -133,8 +133,8 @@ fn main(){
 
     let mut measurement:bool = false;
     if (args.len() > 2) && (args[2].parse::<String>().unwrap() == "m") { measurement = true; }
-    if measurement { println!(">> eduPIC: measurement mode ON"); } 
-    else { println!(">> eduPIC: measurement mode OFF"); }
+    if measurement { println!(">> eduPIC: measurement mode: on"); } 
+    else { println!(">> eduPIC: measurement mode: off"); }
 
     // initializing grid quantities (fixed size)
     let mut efield: Vec<f64>          = vec![0.0;N_G];       // electric field 
@@ -215,8 +215,8 @@ fn main(){
         for t in 0..N_T{
             if t%1000==0 {
                 println!(
-                    "c = 1  t = {}  #e = {}  #i = {}",
-                    t, Electrons.len(), Ions.len() );
+                    "c = {:8}  t = {:8}  #e = {:8}  #i = {:8}",
+                    1, t, Electrons.len(), Ions.len() );
             }
 
             get_density(&mut e_density, &mut cumul_e_density, &mut Electrons);
@@ -236,6 +236,7 @@ fn main(){
         }
 
         cycles_done = 1;
+        writeln!(conv_file, "{:10}   {:10}   {:10}", cycles_done, Electrons.len(), Ions.len()).map_err(|err| println!("{:?}", err)).ok();
         save_particle_data(String::from("picdata.bin"), cycles_done, &Electrons, &Ions).map_err(|err| println!("{:?}", err)).ok();
 
     } else {
@@ -243,11 +244,11 @@ fn main(){
         let(mut cycles_done, mut Electrons, mut Ions) = load_particle_data(String::from("picdata.bin"));
 
         println!(">> eduPIC: Running {} cycles...",cycle);
-        for c in 0..cycle{
+        for c in 1..=cycle{
             for t in 0..N_T{
                 if t%1000==0{
                     println!(
-                        "c = {}  t = {}  #e = {}  #i = {}",
+                        "c = {:8}  t = {:8}  #e = {:8}  #i = {:8}",
                         cycles_done+c, t, Electrons.len(), Ions.len() );
                 }
 
@@ -386,7 +387,7 @@ fn main(){
             save_xt_2("meanei_xt.dat", &meanei_xt, &counter_i_xt).map_err(|err| println!("{:?}", err)).ok();
         }
     }
-    println!(">> eduPIC: Simulation of {} cycle(s) is done lasting {:.3} sec.", cycle, 0.001*start.elapsed().as_millis() as f64);
+    println!(">> eduPIC: Simulation of {} cycle(s) is completed lasting {:.3} sec.", cycle, 0.001*start.elapsed().as_millis() as f64);
 }
 
 //----------------------------------------------------------------------//

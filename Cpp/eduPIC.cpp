@@ -179,7 +179,7 @@ std::normal_distribution<> RMB(0.0,sqrt(K_BOLTZMANN * TEMPERATURE / AR_MASS));
 //----------------------------------------------------------------------------//
 
 void set_electron_cross_sections_ar(void){
-    cout<<">> eduPIC: Setting Ar+ / Ar cross sections"<<endl;
+    cout<<">> eduPIC: Setting e- / Ar cross sections"<<endl;
 
     auto qmel = [](auto en){ return 1e-20*(fabs(6.0 / pow(1.0 + (en/0.1) + pow(en/0.6,2.0), 3.3)
         - 1.1 * pow(en, 1.4) / (1.0 + pow(en/15.0, 1.2)) / sqrt(1.0 + pow(en/5.5, 2.5) + pow(en/60.0, 4.1)))
@@ -716,7 +716,7 @@ void do_one_cycle (void){
             }
         }
 
-           if ((t % 1000) == 0) cout<<" c = "<<cycle<<"  t = "<<t<<"  #e = "<<N_e<<"  #i = "<<N_i<<endl;
+           if ((t % 1000) == 0) cout<<" c = "<<setw(8)<<cycle<<"  t = "<<setw(8)<<t<<"  #e = "<<setw(8)<<N_e<<"  #i = "<<setw(8)<<N_i<<endl;
     }
     datafile<<cycle<<" "<<N_e<<" "<<N_i<<endl;
 }
@@ -968,7 +968,7 @@ void check_and_save_info(void){
         // saving of the following data is done here as some of the further lines need data
         // that are computed / normalized in these functions
 
-        f<<">> eduPIC: saving diagnostics data"<<endl;
+        cout<<">> eduPIC: saving diagnostics data"<<endl;
         save_density();
         save_eepf();
         save_ifed();
@@ -1065,5 +1065,5 @@ int main (int argc, char *argv[]){
     if (measurement_mode) {
         check_and_save_info();
     }
-    cout<<">> eduPIC: simulation of "<<no_of_cycles<<" cycle(s) is done."<<endl;
+    cout<<">> eduPIC: simulation of "<<no_of_cycles<<" cycle(s) is completed."<<endl;
 }
