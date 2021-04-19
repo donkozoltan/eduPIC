@@ -729,7 +729,7 @@ void save_particle_data(){
     char fname[80];
     
     strcpy(fname,"picdata.bin");
-    f = fopen(fname,"w");
+    f = fopen(fname,"wb");
     fwrite(&Time,sizeof(double),1,f);
     d = (double)(cycles_done);
     fwrite(&d,sizeof(double),1,f);
@@ -759,7 +759,7 @@ void load_particle_data(){
     char fname[80];
     
     strcpy(fname,"picdata.bin");
-    f = fopen(fname,"r");
+    f = fopen(fname,"rb");
     if (f==NULL) {printf(">> eduPIC: ERROR: No particle data file found, try running initial cycle using argument '0'\n"); exit(0); }
     fread(&Time,sizeof(double),1,f);
     fread(&d,sizeof(double),1,f);
