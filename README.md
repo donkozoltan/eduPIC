@@ -6,7 +6,7 @@ The physical basis of the simulation approach as well as specific details of the
 
 The code is provided in three different programming languages: C, C++, and Rust. All versions, especially the basic C version, have been developed focusing on transparency. Instructions for code compilation and execution, as well as explanations of the program output and example results of a study of capacitively coupled plasmas are provided in the paper cited above. 
 
-A more detailed User Manual is under development and will be provided in this repository.
+A more detailed User Manual is provided for the C code.
 
 eduPIC is a starting tool that is fully functional but has limited capabilities. Further development and optimization for your own specific needs are encouraged. These additions and extensions are, however, not planned to be incorporated into the code provided here. Please contact us if you experience any issues with the code, at donko.zoltan@wigner.hu
 
