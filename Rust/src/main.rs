@@ -9,7 +9,7 @@
 // B. Hartmann, P. Hartmann:                                         //
 // "eduPIC: an introductory particle based  code for radio-frequency //
 // plasma simulation"                                                //
-// Plasma Sources Science and Technology, vol XXX, pp. XXX (2021)    //
+// Plasma Sources Science and Technology, vol 30, pp. 095017 (2021)  //
 //-------------------------------------------------------------------//
 // Disclaimer: The eduPIC (educational Particle-in-Cell/Monte Carlo  //
 // Collisions simulation code), Copyright (C) 2021                   //
